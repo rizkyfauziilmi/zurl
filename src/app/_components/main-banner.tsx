@@ -32,7 +32,7 @@ export function MainBanner() {
             <span className="text-primary relative z-10 font-bold">
               lightning-fast redirects, advanced analytics
             </span>
-          </PointerHighlight>
+          </PointerHighlight>{" "}
           and
           <PointerHighlight
             rectangleClassName="bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 leading-loose"

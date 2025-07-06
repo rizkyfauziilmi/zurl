@@ -31,7 +31,7 @@ export function Demo() {
       id="demo"
       className="flex h-screen flex-col items-center justify-center"
     >
-      <CardSpotlight className="flex w-full max-w-2xl flex-col items-start gap-2">
+      <div className="flex flex-col items-center justify-center rounded-md border p-8 shadow-md">
         <div className="z-10 mb-2 flex items-center gap-2">
           <span
             role="img"
@@ -58,16 +58,6 @@ export function Demo() {
                 setUrl(e.target.value);
               }}
               value={url}
-              onBlur={() => {
-                if (url) {
-                  demoMutation.mutate({
-                    url,
-                  });
-                }
-              }}
-              onFocus={() => {
-                setCode(undefined);
-              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && url) {
                   demoMutation.mutate({ url });
@@ -87,12 +77,13 @@ export function Demo() {
             <Link
               href={`${baseUrl}/${code}`}
               className="text-muted-foreground whitespace-nowrap hover:underline"
+              target="_blank"
             >{`${baseUrl}/${code}`}</Link>
           ) : (
             <p className="text-muted-foreground animate-pulse whitespace-nowrap">{`${baseUrl}/123`}</p>
           )}
         </div>
-      </CardSpotlight>
+      </div>
     </div>
   );
 }

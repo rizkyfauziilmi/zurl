@@ -8,7 +8,9 @@ export async function MainNavbar() {
 
   return (
     <div className="bg-background sticky top-0 z-50 flex items-center justify-between border-b px-4 py-2">
-      <Brand />
+      <div className="flex-1/5">
+        <Brand />
+      </div>
       <div className="flex flex-3/5 items-center justify-center gap-8">
         <Link href="#">
           <p className="text-muted-foreground hover:text-primary text-sm hover:underline">

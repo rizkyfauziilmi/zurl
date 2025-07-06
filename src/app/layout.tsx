@@ -5,7 +5,6 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "~/components/theme-provider";
-import { MainNavbar } from "~/components/main-navbar";
 import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -36,7 +35,6 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <MainNavbar />
             <main>{children}</main>
             <Toaster />
           </ThemeProvider>

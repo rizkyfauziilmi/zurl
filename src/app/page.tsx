@@ -1,10 +1,13 @@
 import { TracingBeam } from "~/components/ui/tracing-beam";
 import { Demo } from "./_components/demo";
 import { MainBanner } from "./_components/main-banner";
+import { Footer } from "~/components/footer";
+import { MainNavbar } from "~/components/main-navbar";
 
-export default function Home() {
+export default function HomePage() {
   return (
     <div>
+      <MainNavbar />
       <MainBanner />
       <TracingBeam>
         <Demo />
@@ -13,6 +16,7 @@ export default function Home() {
           <p className="text-xl">This is a demo page</p>
         </div>
       </TracingBeam>
+      <Footer />
     </div>
   );
 }

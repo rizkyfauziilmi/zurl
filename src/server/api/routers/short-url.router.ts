@@ -5,6 +5,7 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { encodeBase64Id } from "~/lib/base64";
+import { TRPCError } from "@trpc/server";
 
 export const shortUrlRouter = createTRPCRouter({
   demo: publicProcedure
@@ -67,5 +68,18 @@ export const shortUrlRouter = createTRPCRouter({
       });
 
       return { shortCode };
+    }),
+  getRedirect: publicProcedure
+    .input(
+      z.object({
+        slug: z.string().min(1),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      return ctx.db.shortUrl.findUnique({
+        where: {
+          shortCode: input.slug,
+        },
+      });
     }),
 });
