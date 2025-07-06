@@ -5,17 +5,12 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { encodeBase64Id } from "~/lib/base64";
-import { TRPCError } from "@trpc/server";
+import { shortUrlSchema } from "../schemas/short-url.schema";
 
 export const shortUrlRouter = createTRPCRouter({
   demo: publicProcedure
-    .input(
-      z.object({
-        url: z.string().url({
-          message: "Please enter a valid URL",
-        }),
-      }),
-    )
+    .input(shortUrlSchema)
+    // TODO: use expired mechanism instead (24 hours)
     .mutation(async ({ input, ctx }) => {
       const isAlreadyShortenedInDemo = await ctx.db.shortUrl.findFirst({
         where: {
@@ -82,11 +77,12 @@ export const shortUrlRouter = createTRPCRouter({
         },
       });
 
+      // TODO: add logic to handle expired demo shortUrls
       // when shortUrl is demo and first access then delete in db
-      if (shortUrl?.userId === undefined) {
+      if (shortUrl && !shortUrl.userId) {
         await ctx.db.shortUrl.delete({
           where: {
-            id: shortUrl?.id,
+            id: shortUrl.id,
           },
         });
       }

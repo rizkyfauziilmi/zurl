@@ -1,14 +1,43 @@
 import { Zap } from "lucide-react";
 import Link from "next/link";
+import { cn } from "~/lib/utils";
 
-export function Brand({ size = 24 }: { size?: number }) {
+interface BrandProps {
+  isText?: boolean;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}
+
+export function Brand({
+  isText: isTest = true,
+  size = "sm",
+  className,
+}: BrandProps) {
   return (
     <Link href="/">
-      <div className="mb-4 flex items-center space-x-2 md:mb-0">
-        <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-600">
-          <Zap className="h-4 w-4 text-white" />
+      <div className={cn("flex items-center space-x-2 md:mb-0", className)}>
+        <div
+          className={cn(
+            "flex items-center justify-center rounded bg-gradient-to-br from-blue-600 to-indigo-700 shadow-lg",
+            size === "sm"
+              ? "h-6 w-6"
+              : size === "md"
+                ? "h-10 w-10"
+                : "h-16 w-16",
+          )}
+        >
+          <Zap
+            className={cn(
+              "text-white",
+              size === "sm"
+                ? "h-4 w-4"
+                : size === "md"
+                  ? "h-8 w-8"
+                  : "h-12 w-12",
+            )}
+          />
         </div>
-        <span className="font-bold">zurl</span>
+        {isTest && <span className="font-bold">zurl</span>}
       </div>
     </Link>
   );
