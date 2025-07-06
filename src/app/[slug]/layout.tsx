@@ -1,3 +1,4 @@
+import { Footer } from "~/components/footer";
 import { MainNavbar } from "~/components/main-navbar";
 
 export default function RedirectLayout({
@@ -9,6 +10,7 @@ export default function RedirectLayout({
     <div>
       <MainNavbar />
       {children}
+      <Footer />
     </div>
   );
 }

@@ -76,10 +76,21 @@ export const shortUrlRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      return ctx.db.shortUrl.findUnique({
+      const shortUrl = await ctx.db.shortUrl.findUnique({
         where: {
           shortCode: input.slug,
         },
       });
+
+      // when shortUrl is demo and first access then delete in db
+      if (shortUrl?.userId === undefined) {
+        await ctx.db.shortUrl.delete({
+          where: {
+            id: shortUrl?.id,
+          },
+        });
+      }
+
+      return shortUrl;
     }),
 });

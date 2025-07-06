@@ -1,8 +1,7 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
+
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -21,7 +20,6 @@ import {
   ArrowRight,
   UnlinkIcon,
 } from "lucide-react";
-import { Footer } from "~/components/footer";
 
 export default function NotFoundRedirect() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -231,7 +229,6 @@ export default function NotFoundRedirect() {
           </Card>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
