@@ -9,7 +9,7 @@ import URLShortenerDemo from "./url-shortener-demo";
 
 export function MainBanner() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 antialiased md:pt-[25vh]">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 antialiased">
       <Brand className="z-10" isText={false} size="lg" />
       <div className="z-10 -mt-4 max-w-3xl space-y-12">
         <div className="space-y-3 text-center">
