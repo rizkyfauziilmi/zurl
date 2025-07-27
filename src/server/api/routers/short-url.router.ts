@@ -6,11 +6,11 @@ import {
 } from "~/server/api/trpc";
 import { encodeBase64Id } from "~/lib/base64";
 import { shortUrlSchema } from "../schemas/short-url.schema";
+import { addDays } from "date-fns";
 
 export const shortUrlRouter = createTRPCRouter({
   demo: publicProcedure
     .input(shortUrlSchema)
-    // TODO: use expired mechanism instead (24 hours)
     .mutation(async ({ input, ctx }) => {
       const isAlreadyShortenedInDemo = await ctx.db.shortUrl.findFirst({
         where: {
@@ -48,6 +48,7 @@ export const shortUrlRouter = createTRPCRouter({
         data: {
           originalUrl: input.url,
           userId: undefined,
+          expiresAt: addDays(new Date(), 1), // Set expiration to 1 day for demo URLs
         },
       });
 
@@ -77,14 +78,21 @@ export const shortUrlRouter = createTRPCRouter({
         },
       });
 
-      // TODO: add logic to handle expired demo shortUrls
-      // when shortUrl is demo and first access then delete in db
-      if (shortUrl && !shortUrl.userId) {
-        await ctx.db.shortUrl.delete({
-          where: {
-            id: shortUrl.id,
-          },
-        });
+      // if the shortUrl is a demo or has expired, delete it
+      if (shortUrl) {
+        const isDemo = !shortUrl.userId;
+        const isExpired = shortUrl.expiresAt && shortUrl.expiresAt < new Date();
+
+        if (isDemo || isExpired) {
+          await ctx.db.shortUrl.delete({
+            where: { id: shortUrl.id },
+          });
+        }
+
+        // If the short URL is expired, return null
+        if (isExpired) {
+          return null;
+        }
       }
 
       return shortUrl;

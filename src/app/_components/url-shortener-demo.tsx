@@ -34,6 +34,7 @@ import {
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { useState } from "react";
+import { addDays, formatDistanceToNow } from "date-fns";
 
 export default function URLShortenerDemo() {
   const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
@@ -41,7 +42,6 @@ export default function URLShortenerDemo() {
   const [originalUrl, setOriginalUrl] = useState<string>("");
 
   const demoMutation = api.shortUrl.demo.useMutation({
-    // TODO: when expired implemented, change description (used once and will automatically expire in 24 hours)
     onSuccess: (data) => {
       const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${data.shortCode}`;
       setShortenedUrl(url);
@@ -278,7 +278,9 @@ export default function URLShortenerDemo() {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">24 hours</div>
+                  <div className="text-2xl font-bold">
+                    {formatDistanceToNow(addDays(new Date(), 1))}
+                  </div>
                   <div className="text-xs tracking-wide text-green-600 uppercase">
                     Expires
                   </div>
