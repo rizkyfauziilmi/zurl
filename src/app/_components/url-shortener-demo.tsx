@@ -46,7 +46,7 @@ export default function URLShortenerDemo() {
       const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${data.shortCode}`;
       setShortenedUrl(url);
       toast.success("URL shortened successfully", {
-        description: "url can only be used once",
+        description: `url can only be used once and will automatically expire in 24 hours`,
         action: {
           label: "Copy",
           onClick: () => {

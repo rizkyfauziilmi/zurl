@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { encodeBase64Id } from "~/lib/base64";
 import { shortUrlSchema } from "../schemas/short-url.schema";
 import { addDays } from "date-fns";
@@ -12,36 +8,38 @@ export const shortUrlRouter = createTRPCRouter({
   demo: publicProcedure
     .input(shortUrlSchema)
     .mutation(async ({ input, ctx }) => {
-      const isAlreadyShortenedInDemo = await ctx.db.shortUrl.findFirst({
+      const existing = await ctx.db.shortUrl.findFirst({
         where: {
-          AND: [
-            {
-              originalUrl: input.url,
-            },
-            {
-              userId: undefined,
-            },
-          ],
+          originalUrl: input.url,
+          userId: undefined,
         },
       });
 
-      if (isAlreadyShortenedInDemo) {
-        if (isAlreadyShortenedInDemo.shortCode) {
-          return { shortCode: isAlreadyShortenedInDemo.shortCode };
-        } else {
-          const shortCode = encodeBase64Id(isAlreadyShortenedInDemo.id);
-
-          await ctx.db.shortUrl.update({
-            where: {
-              id: isAlreadyShortenedInDemo.id,
-            },
-            data: {
-              shortCode,
-            },
-          });
-
-          return { shortCode };
+      if (existing) {
+        // If shortCode exists, return it; otherwise, generate and update
+        if (existing.shortCode) {
+          return {
+            shortCode: existing.shortCode,
+          };
         }
+
+        const shortCode = encodeBase64Id(existing.id);
+
+        const updatedShortUrl = await ctx.db.shortUrl.update({
+          where: {
+            id: existing.id,
+          },
+          data: {
+            shortCode,
+          },
+          select: {
+            shortCode: true,
+          },
+        });
+
+        return {
+          shortCode: updatedShortUrl.shortCode,
+        };
       }
 
       const newShortUrl = await ctx.db.shortUrl.create({
@@ -78,18 +76,20 @@ export const shortUrlRouter = createTRPCRouter({
         },
       });
 
-      // if the shortUrl is a demo or has expired, delete it
+     
       if (shortUrl) {
         const isDemo = !shortUrl.userId;
         const isExpired = shortUrl.expiresAt && shortUrl.expiresAt < new Date();
 
-        if (isDemo || isExpired) {
+        // if the shortUrl is a demo delete it
+        // ! DO NOT delete if expired, because it can be reused by updating expiresAt
+        if (isDemo) {
           await ctx.db.shortUrl.delete({
             where: { id: shortUrl.id },
           });
         }
-
-        // If the short URL is expired, return null
+        
+        // when shortUrl is expired then return null
         if (isExpired) {
           return null;
         }

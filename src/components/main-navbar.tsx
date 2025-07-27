@@ -1,7 +1,6 @@
 import { auth } from "~/server/auth";
 import { Button } from "./ui/button";
 import { Brand } from "./brand";
-import Link from "next/link";
 
 export async function MainNavbar() {
   const session = await auth();
@@ -12,26 +11,26 @@ export async function MainNavbar() {
         <Brand />
       </div>
       <div className="flex flex-3/5 items-center justify-center gap-8">
-        <Link href="#">
+        <a href="#features">
           <p className="text-muted-foreground hover:text-primary text-sm hover:underline">
             Features
           </p>
-        </Link>
-        <Link href="#">
+        </a>
+        <a href="#solutions">
           <p className="text-muted-foreground hover:text-primary text-sm hover:underline">
             Solutions
           </p>
-        </Link>
-        <Link href="#">
+        </a>
+        <a href="#how-it-works">
           <p className="text-muted-foreground hover:text-primary text-sm hover:underline">
-            Support
+            How it works
           </p>
-        </Link>
-        <Link href="#">
+        </a>
+        <a href="#pricing">
           <p className="text-muted-foreground hover:text-primary text-sm hover:underline">
-            Source Code
+            Pricing
           </p>
-        </Link>
+        </a>
       </div>
       <div className="flex flex-1/5 items-center justify-end">
         {session?.user ? (
