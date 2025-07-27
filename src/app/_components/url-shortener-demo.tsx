@@ -34,11 +34,10 @@ import {
 import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { useState } from "react";
-import { dayjsInstance } from "~/lib/date";
+import { addDays, formatDistanceToNow } from "date-fns";
 
 export default function URLShortenerDemo() {
   const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
-  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [copied, setCopied] = useState(false);
   const [originalUrl, setOriginalUrl] = useState<string>("");
 
@@ -46,7 +45,6 @@ export default function URLShortenerDemo() {
     onSuccess: (data) => {
       const url = `${process.env.NEXT_PUBLIC_BASE_URL}/${data.shortCode}`;
       setShortenedUrl(url);
-      setExpiresAt(data.expiresAt);
       toast.success("URL shortened successfully", {
         description: `url can only be used once and will automatically expire in 24 hours`,
         action: {
@@ -74,7 +72,6 @@ export default function URLShortenerDemo() {
 
   function onSubmit(values: z.infer<typeof shortUrlSchema>) {
     setShortenedUrl(null);
-    setExpiresAt(null);
     setOriginalUrl(values.url);
 
     demoMutation.mutate(values);
@@ -282,7 +279,7 @@ export default function URLShortenerDemo() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold">
-                    {dayjsInstance(expiresAt).fromNow()}
+                    {formatDistanceToNow(addDays(new Date(), 1))}
                   </div>
                   <div className="text-xs tracking-wide text-green-600 uppercase">
                     Expires
@@ -294,7 +291,6 @@ export default function URLShortenerDemo() {
               <Button
                 onClick={() => {
                   setShortenedUrl(null);
-                  setExpiresAt(null);
                   setOriginalUrl("");
                   form.reset();
                 }}

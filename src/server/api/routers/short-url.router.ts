@@ -2,14 +2,12 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { encodeBase64Id } from "~/lib/base64";
 import { shortUrlSchema } from "../schemas/short-url.schema";
-import { dayjsInstance } from "~/lib/date";
+import { addDays } from "date-fns";
 
 export const shortUrlRouter = createTRPCRouter({
   demo: publicProcedure
     .input(shortUrlSchema)
     .mutation(async ({ input, ctx }) => {
-      const oneDayAfter = dayjsInstance().add(1, "day");
-
       const existing = await ctx.db.shortUrl.findFirst({
         where: {
           originalUrl: input.url,
@@ -22,7 +20,6 @@ export const shortUrlRouter = createTRPCRouter({
         if (existing.shortCode) {
           return {
             shortCode: existing.shortCode,
-            expiresAt: existing.expiresAt,
           };
         }
 
@@ -34,17 +31,14 @@ export const shortUrlRouter = createTRPCRouter({
           },
           data: {
             shortCode,
-            expiresAt: oneDayAfter.toDate(),
           },
           select: {
             shortCode: true,
-            expiresAt: true,
           },
         });
 
         return {
           shortCode: updatedShortUrl.shortCode,
-          expiresAt: updatedShortUrl.expiresAt,
         };
       }
 
@@ -52,7 +46,7 @@ export const shortUrlRouter = createTRPCRouter({
         data: {
           originalUrl: input.url,
           userId: undefined,
-          expiresAt: oneDayAfter.toDate(),
+          expiresAt: addDays(new Date(), 1), // Set expiration to 1 day for demo URLs
         },
       });
 
@@ -67,7 +61,7 @@ export const shortUrlRouter = createTRPCRouter({
         },
       });
 
-      return { shortCode, expiresAt: newShortUrl.expiresAt };
+      return { shortCode };
     }),
   getRedirect: publicProcedure
     .input(
@@ -82,19 +76,23 @@ export const shortUrlRouter = createTRPCRouter({
         },
       });
 
-      // when shortUrl is demo and first access then delete in db
-      if (shortUrl && !shortUrl.userId) {
-        await ctx.db.shortUrl.delete({
-          where: {
-            id: shortUrl.id,
-          },
-        });
-      }
+     
+      if (shortUrl) {
+        const isDemo = !shortUrl.userId;
+        const isExpired = shortUrl.expiresAt && shortUrl.expiresAt < new Date();
 
-      // when shortUrl is expired then return null
-      // ! DO NOT delete if expired, because it can be reused by updating expiresAt
-      if (shortUrl?.expiresAt && shortUrl.expiresAt < new Date()) {
-        return null;
+        // if the shortUrl is a demo delete it
+        // ! DO NOT delete if expired, because it can be reused by updating expiresAt
+        if (isDemo) {
+          await ctx.db.shortUrl.delete({
+            where: { id: shortUrl.id },
+          });
+        }
+        
+        // when shortUrl is expired then return null
+        if (isExpired) {
+          return null;
+        }
       }
 
       return shortUrl;

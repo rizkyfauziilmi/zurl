@@ -57,7 +57,7 @@ model ShortUrl {
   id          Int       @id @default(autoincrement())
   shortCode   String?   @unique @map("short_code") @db.VarChar(10)
   originalUrl String    @map("original_url")
-  expiresAt   DateTime?
+  expiresAt   DateTime? @map("expires_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @map("updated_at")
